@@ -22,7 +22,7 @@ def load_game
     load_file
   else
     puts 'There are no saved games, a new game has been started '
-    Game.new
+    Game.new(nil, nil, nil, nil)
   end
 end
 
