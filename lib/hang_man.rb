@@ -63,7 +63,7 @@ def overwrite(file_name)
   return file_name unless file_exists?(file_name)
 
   new_file = file_name
-  unless options(['Yes', "Create new file as '#{file_name}[#{Dir.children('./saved_games').length}]'"],
+  unless options(['Yes', "Create new file named as '#{file_name}[#{Dir.children('./saved_games').length}]'"],
                  'This file already exists, want to overwrite it?').eql?('Yes')
     new_file += "[#{Dir.children('./saved_games').length}]"
   end
@@ -389,7 +389,7 @@ class Human < Player
 
   # human guesses letter
   def guess_letter(board, guessed_word)
-    prompt("#{@name}, Choose a (1) character to guess the code, type 'save' to save current game and type 'quit' exit")
+    prompt_guesser
     letter = nil
     validate_guess(letter, board, guessed_word)
   end
@@ -413,7 +413,7 @@ class Human < Player
     until letter && choice_in_range?(letter.length, 1)
       letter = gets.chomp
       if letter.downcase.eql?('quit') || letter.downcase.eql?('save')
-        (are_you_sure?(letter, board, guessed_word) ? break : next)
+        are_you_sure?(letter, board, guessed_word) ? break : next
       end
       validation_error(letter)
     end
@@ -432,8 +432,12 @@ class Human < Player
     return 'Yes' if options(%w[Yes No], "Are you sure you want to #{context}?").eql?('Yes')
 
     board.put_board(@wrong_tries, @chosen_letters, guessed_word)
-    prompt("Choose a (1) character to guess the code, type 'save' to save current game and type 'quit' exit")
+    prompt_guesser
   end
+end
+
+def prompt_guesser
+  prompt("#{@name}, Choose a (1) character to guess the code, type 'save' to save current game and type 'quit' to exit")
 end
 
 # Computer

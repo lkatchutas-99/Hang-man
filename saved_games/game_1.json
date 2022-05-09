@@ -1,0 +1,72 @@
+{
+    "json_class": "Game",
+    "data": {
+        "setter": {
+            "player_name": "Computer_414",
+            "player_type": "Computer",
+            "player_mode": "setter",
+            "score": 0,
+            "wrong_tries": 0,
+            "correct_word": [
+                {
+                    "correct_letter": "b",
+                    "found": false
+                },
+                {
+                    "correct_letter": "r",
+                    "found": false
+                },
+                {
+                    "correct_letter": "o",
+                    "found": true
+                },
+                {
+                    "correct_letter": "a",
+                    "found": false
+                },
+                {
+                    "correct_letter": "d",
+                    "found": false
+                },
+                {
+                    "correct_letter": "e",
+                    "found": true
+                },
+                {
+                    "correct_letter": "r",
+                    "found": false
+                }
+            ],
+            "chosen_letters": []
+        },
+        "guesser": {
+            "player_name": "Luka",
+            "player_type": "Human",
+            "player_mode": "guesser",
+            "score": 0,
+            "wrong_tries": 5,
+            "correct_word": null,
+            "chosen_letters": [
+                "e",
+                "s",
+                "t",
+                "o",
+                "p",
+                "l",
+                "g"
+            ]
+        },
+        "board": {
+            "columns": 7
+        },
+        "guessed_word": [
+            null,
+            null,
+            "o",
+            null,
+            null,
+            "e",
+            null
+        ]
+    }
+}
