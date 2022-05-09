@@ -1,6 +1,5 @@
 # frozen_string_literal: false
 
-require 'ostruct'
 require 'json'
 require 'pry-byebug'
 
@@ -56,7 +55,8 @@ def overwrite(file_name)
   return file_name unless file_exists?(file_name)
 
   new_file = file_name
-  if options(%w[Yes No], 'This file already exists, want to overwrite it?').eql?('No')
+  unless options(['Yes', "Create new file as '#{file_name}[#{Dir.children('./saved_games').length}]'"],
+                 'This file already exists, want to overwrite it?').eql?('Yes')
     new_file += "[#{Dir.children('./saved_games').length}]"
   end
   new_file
@@ -180,30 +180,6 @@ class Game
     new(setter, guesser, board, guessed_word)
   end
 
-  def init_players
-    player = options(%w[Human Computer], 'What should be the setter?')
-    create_players(player)
-    @setter.player_name
-    @guesser.player_name
-  end
-
-  def create_players(player)
-    @setter = get_setter(player)
-    @guesser = Human.new('guesser')
-  end
-
-  def init_board(columns)
-    @board = Board.new(columns)
-    @board.put_board(6, [])
-  end
-
-  def init_columns
-    @setter.setup_word
-    puts 'This is what the board looks like when the whole character is present'
-    init_board(@setter.word.length)
-    @guessed_word = Array.new(@setter.word.length)
-  end
-
   def play_game
     init_columns if @guesser.wrong_tries.eql?(0)
     until @guesser.wrong_tries.eql?(7) || @guessed_word.none?(&:nil?)
@@ -212,6 +188,32 @@ class Game
     evaluate_winner(@guesser.wrong_tries)
     @guesser.wrong_tries = 0
     @guesser.chosen_letters = []
+  end
+
+  private
+
+  def init_players
+    player = options(%w[Human Computer], 'What should be the setter?')
+    create_players(player)
+    @setter.player_name
+    @guesser.player_name
+  end
+
+  def init_board(columns)
+    @board = Board.new(columns)
+    @board.put_board(6, [])
+  end
+
+  def create_players(player)
+    @setter = get_setter(player)
+    @guesser = Human.new('guesser')
+  end
+
+  def init_columns
+    @setter.setup_word
+    puts 'This is what the board looks like when the whole character is present'
+    init_board(@setter.word.length)
+    @guessed_word = Array.new(@setter.word.length)
   end
 
   def evaluate_guessed_letter
@@ -308,18 +310,18 @@ class Player
     nil
   end
 
-  def joined_word(word_arr)
-    word_arr.reduce('') do |str, letter|
-      str += letter['correct_letter']
-      str
-    end
-  end
-
   def winner(word_arr)
     puts "End of game, word was #{joined_word(word_arr)}"
     print "Congrats #{@name}#{', the guesser could not find the word.' if @player_mode.eql?('setter')}"
     puts ' You win and you gained a point'
     @score += 1
+  end
+
+  def joined_word(word_arr)
+    word_arr.reduce('') do |str, letter|
+      str += letter['correct_letter']
+      str
+    end
   end
 end
 
@@ -340,6 +342,19 @@ class Human < Player
     validate_guess(letter, board, guessed_word)
   end
 
+  def setup_word
+    @wrong_tries = 0
+    prompt("#{@name.capitalize} (setter), please enter the secret word (between 5 and 12 characters)")
+    word = ''
+    until choice_in_range?(word.length, 12, 5)
+      word = gets.chomp
+      error_message('word must be between 5 and 12 characters inclusive') unless choice_in_range?(word.length, 12, 5)
+    end
+    super(word)
+  end
+
+  private
+
   def validate_guess(letter, board, guessed_word)
     until letter && choice_in_range?(letter.length, 1)
       letter = gets.chomp
@@ -355,17 +370,6 @@ class Human < Player
     return if letter.nil? || choice_in_range?(letter.length, 1)
 
     error_message('only one letter, "save" or "quit" is accepted')
-  end
-
-  def setup_word
-    @wrong_tries = 0
-    prompt("#{@name.capitalize} (setter), please enter the secret word (between 5 and 12 characters)")
-    word = ''
-    until choice_in_range?(word.length, 12, 5)
-      word = gets.chomp
-      error_message('word must be between 5 and 12 characters inclusive') unless choice_in_range?(word.length, 12, 5)
-    end
-    super(word)
   end
 
   def are_you_sure?(context, board, guessed_word)
@@ -425,6 +429,8 @@ class Board
     puts "#{guesser.name} (guesser): #{guesser.score} "
     puts "#{setter.name} (setter): #{setter.score} "
   end
+
+  private
 
   def hang_man_guy(limbs)
     guy = positioning('  ')
