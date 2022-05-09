@@ -26,8 +26,8 @@ end
 
 def load_file
   file = options(Dir.children('./saved_games'), 'Select a file to load')
-  Game.json_create(JSON.parse(File.read("./saved_games/#{file}")))
   puts 'Resuming from previous session'
+  Game.json_create(JSON.parse(File.read("./saved_games/#{file}")))
 end
 
 def save_game(data)
@@ -102,7 +102,7 @@ end
 def options(option_list, prompt = 'Please choose one of the following options')
   prompt_option(option_list, prompt)
   puts "\nSelect a number corresponding to an option:"
-  prompt(display_options(option_list, prompt))
+  prompt(display_options(option_list))
   option_list[validate_option(option_list).to_i - 1]
 end
 
@@ -155,7 +155,7 @@ class Game
     @guesser = guesser
     @board = board
     @guessed_word = guessed_word
-    init_players if setter.nil?
+    setter.nil? ? init_players : @board.put_board(@guesser.wrong_tries, @guesser.chosen_letters, @guessed_word)
   end
 
   def to_json(*keys)
@@ -288,7 +288,7 @@ class Player
   end
 
   def setup_word(word)
-    @word = word.split('').each_with_object([]) do |arr, letter|
+    @word = word.split('').each_with_object([]) do |letter, arr|
       arr.push({ 'correct_letter' => letter, 'found' => false })
     end
   end
