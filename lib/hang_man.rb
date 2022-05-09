@@ -183,9 +183,7 @@ class Game
     @guesser = guesser
     @board = board
     @guessed_word = guessed_word
-    if setter.nil?
-      init_players 
-    end
+    init_players if setter.nil?
     @board.put_board(@guesser.wrong_tries, @guesser.chosen_letters, @guessed_word) unless @guesser.wrong_tries.zero?
   end
 
